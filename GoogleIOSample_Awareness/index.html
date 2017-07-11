@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Google I/O - Awareness API : Real Time Position</title>
+		<meta name="viewport" content="initial-scale=1.0">
+    	<meta charset="utf-8">
+    	
+    	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+  
+ 		<!-- 2017. 06. 07. : Cho Yonrkyun : Map Library -->
+ 		<link rel="stylesheet" href="./src/view/loading/loading.css" />
+	    <script src="./src/view/loading/loading.js"></script>
+    	
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : DragAndDrop Library -->
+    	<link rel="stylesheet" href="./src/external/dropzone/dropzone.css" />
+    	<link rel="stylesheet" href="./src/external/dropzone/style/style.css" />
+    	<script src="./src/external/dropzone/dropzone.js"></script>
+  
+  
+  		<!-- 2017. 06. 07. : Cho Yonrkyun : DateTimePicker Library -->
+  		<script src="./src/external/moment/moment.js"></script>
+  		<script src="./src/external/combodate/combodate.js"></script>
+  
+  
+  		<!-- 2017. 06. 07. : Cho Yonrkyun : DateTimePicker Library -->
+  		<link rel="stylesheet" href="./src/external/sweetalert2/sweetalert2.min.css" />
+  		<script src="./src/external/sweetalert2/sweetalert2.min.js"></script>
+  		
+  		
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Node.js Request Library -->
+    	<script src="./src/common/machine-learning/machine-learning.js"></script>
+    	
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Util Library -->
+    	<script src="./src/common/util/base64.js"></script>
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Map Library -->
+    	<script src="./src/common/map/marker.js"></script>
+    	<script src="./src/common/map/polyline.js"></script>
+    	<script src="./src/common/map/circle.js"></script>
+    	
+    	<script src="./src/common/map/directions.js"></script>
+    	<script src="./src/common/map/distanceMatrix.js"></script>
+    	<script src="./src/common/map/geocode.js"></script>
+    	
+   	    <link rel="manifest" href="./manifest.json">
+    	
+    	
+    	
+    	
+    	<style>
+			/* Always set the map height explicitly to define the size of the div
+		 	 * element that contains the map.
+		 	 */
+      		#map {
+        	 	display: block;
+				position:absolute;
+				height:auto;
+				bottom:0;
+				top:0;
+				left:0;
+				right:0;
+				background-color: rgba(0, 0, 0, 0.3);
+      		}
+      		
+      		html, body {
+				width   : 100%;
+				height  : 100%;
+				margin  : 0;
+				padding : 0;
+			}
+			
+			
+			#information-panel{
+				width: 350px;
+				
+				height:100%;
+			        
+			    background-color: rgba(0, 0, 0, 0.7);
+			    
+			    position: absolute;
+			    top: 0px;
+			    left: 0px;
+			    z-index: 90;
+			    
+			    box-shadow: 0 0 20px rgba(0,0,0,0.3);;
+			    
+			    padding :10px; 
+			    
+			  overflow-y: auto;
+			    
+			    /*display:none;*/
+			}
+			
+			.information-panel-contents {
+			
+			    background-color: #F6F6F6;
+			    margin-top: 0px;
+			    
+			    margin-bottom: 0px;
+			    
+			    margin-left: 0px;
+			    margin-right: 0px;
+			    
+			    padding : 10px 0px 10px 0px;
+			    
+			    -webkit-border-top-right-radius: 2px;
+			    -webkit-border-bottom-left-radius: 2px;
+			    -webkit-border-top-left-radius: 5px;
+			    -webkit-border-bottom-right-radius: 5px;
+			    -moz-border-top-right-radius: 2px;
+			    -moz-border-bottom-left-radius: 2px;
+			    -moz-border-top-left-radius: 5px;
+			    -moz-border-bottom-right-radius: 5px;
+			    border-top-right-radius: 2px;
+			    border-bottom-left-radius: 2px;
+			    border-top-left-radius: 5px;
+			    border-bottom-right-radius: 5px;
+			    
+			}
+						
+			
+					
+		</style>
+		
+		<script>
+			
+			var $Data = new Object();
+			
+			$(document).ready(function() { 
+				
+				
+			});
+			
+		
+		</script>
+    
+    	<script>
+      		var map;
+      		
+      		var polyline; 
+      		
+      		function initMap() {
+        		map = new google.maps.Map(document.getElementById('map'), {
+          			  center: {lat: 37.5653203, lng: 126.9745883}
+          			, zoom: 12
+          			, mapTypeControl: true
+          		    , mapTypeControlOptions: {
+          		          style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
+          		        , position: google.maps.ControlPosition.TOP_RIGHT
+          		    }
+          			
+        		});
+        		
+        		var polylineOptions = {
+					geodesic: true,
+					strokeColor: '#FF0000',
+					strokeOpacity: 1.0,
+					strokeWeight: 2
+       	        };
+        		
+        		polyline = new Polyline(map, polylineOptions);
+        		
+        		var circleOptions = {
+       				strokeColor: '#FFFFFF',
+       	            strokeOpacity: 1.0,
+       	            strokeWeight: 0,
+       	            fillColor: '#6799FF',
+       	            fillOpacity: 0.4,
+       	            radius: 100.0	
+        		};
+        		
+        		var circleSPH = new Circle(map, circleOptions);
+        		circleSPH.setCenter(37.5237446, 126.926865);
+        		circleSPH.draw();
+        		
+        		var circleYY = new Circle(map, circleOptions);
+        		circleYY.setCenter(37.521635, 126.924282);
+        		circleYY.draw();
+        		
+        		var circleKD = new Circle(map, circleOptions);
+        		circleKD.setCenter(37.543597, 126.951694);
+        		circleKD.draw();
+        		
+        		var circleJS = new Circle(map, circleOptions);
+        		circleJS.setCenter(37.584007, 126.909778);
+        		circleJS.draw();
+        		
+        		$Marker.init(map);
+      		}
+    	</script>
+  
+    	<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY&region=KR&callback=initMap" async defer></script>
+    	
+    	<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.2/firebase-app.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.2/firebase-database.js"></script>
+		<script type="text/javascript" src="https://www.gstatic.com/firebasejs/3.6.2/firebase-messaging.js"></script>
+		
+		
+		
+		<script type="text/javascript">
+		
+			function drawDetecedActivity(key, trackingData){
+
+				var postion  = trackingData.position;
+				var detected = trackingData.detected;
+				
+				/* console.log("==> " + key + " : trackingData : ", trackingData)
+				console.log("==> " + key + " : postion : ", postion)
+				console.log("==> " + key + " : detected : ", detected)
+				console.log("============================================================")
+				 */
+				var dateTimeTemp = new Date(parseInt(key));
+				
+				var years = new String(dateTimeTemp.getFullYear());
+				
+				var months = new String(dateTimeTemp.getMonth());
+				months = (months.length == 1 ? "0"+months : months);
+				
+				var days = new String(dateTimeTemp.getDate());
+				days = (days.length == 1 ? "0"+days : days);
+				
+				var hours = new String(dateTimeTemp.getHours());
+				hours = (hours.length == 1 ? "0"+hours : hours);
+				
+				var minutes = new String(dateTimeTemp.getMinutes());
+				minutes = (minutes.length == 1 ? "0"+minutes : minutes);
+				
+				var seconds = new String(dateTimeTemp.getSeconds());
+				seconds = (seconds.length == 1 ? "0"+seconds : seconds);
+				
+				var time = years + "." + months +"." + days + ". " + hours + ":" + minutes + ":" + seconds;
+				
+				var activityName = (detected == null ? "Don't check Activity" : detected.activityName);
+				
+				//var contents = "Time : " + time + "<br>" +  "Activity : " + activityName;
+				var contents = "<table>"
+							 + "  <tr><td>Time</td><td>&nbsp;:&nbsp;&nbsp;</td><td>"+time+"</td></tr>"
+							 + "  <tr><td>Activity</td><td>&nbsp;:&nbsp;&nbsp;</td><td>"+activityName+"</td></tr>"
+							 + "</table>";
+							
+							 
+				var icon = "./img/NONE.png" 
+				if(activityName == "IN_VEHICLE"){
+					icon = "./img/IN_VEHICLE.png"
+				}	
+				else if(activityName == "ON_BICYCLE"){
+					icon = "./img/ON_BICYCLE.png"
+				}
+				else if(activityName == "ON_FOOT"){
+					icon = "./img/ON_FOOT.png"
+				}
+				else if(activityName == "RUNNING"){
+					icon = "./img/RUNNING.png"
+				}
+				else if(activityName == "STILL"){
+					icon = "./img/STILL.png"
+				}
+				else if(activityName == "TILTING"){
+					icon = "./img/TILTING.png"
+				}
+				else if(activityName == "WALKING"){
+					icon = "./img/WALKING.png"
+				}
+							 
+				var options = {
+					  lat : postion.latitude
+					, lng : postion.longitude
+					, title : key
+					, contents : contents
+					, data : trackingData
+					, icon : icon
+				}
+							 
+				polyline.addPoint(postion.latitude,postion.longitude);
+							 
+				$Marker.draw(options)
+			
+			};
+			
+			
+			function drawFencingInfo(key, fencingData){
+				
+				var dateTimeTemp = new Date(parseInt(key));
+				
+				var years = new String(dateTimeTemp.getFullYear());
+				
+				var months = new String(dateTimeTemp.getMonth());
+				months = (months.length == 1 ? "0"+months : months);
+				
+				var days = new String(dateTimeTemp.getDate());
+				days = (days.length == 1 ? "0"+days : days);
+				
+				var hours = new String(dateTimeTemp.getHours());
+				hours = (hours.length == 1 ? "0"+hours : hours);
+				
+				var minutes = new String(dateTimeTemp.getMinutes());
+				minutes = (minutes.length == 1 ? "0"+minutes : minutes);
+				
+				var seconds = new String(dateTimeTemp.getSeconds());
+				seconds = (seconds.length == 1 ? "0"+seconds : seconds);
+				
+				var time = years + "." + months +"." + days + ". " + hours + ":" + minutes + ":" + seconds;
+				
+				var contensDomString = $("#information-panel-contents-dom").html();
+				
+				var fencingType = null;
+				if(fencingData.event.fencekey.indexOf("_ENTERING") != -1){
+					fencingType = "GeoFence Entering";
+				}
+				else if(fencingData.event.fencekey.indexOf("_EXITING") != -1){
+					fencingType = "GeoFence Exiting";
+				}
+				else if(fencingData.event.fencekey.indexOf("_IN") != -1){
+					fencingType = "GeoFence In";
+				}
+				
+				contensDomString = contensDomString.replace("{EVENT_TITLE}", fencingType);
+				
+				var fencingArea = null;
+				if(fencingData.event.fencekey.indexOf("SPH_") != -1){
+					fencingArea = "SPH 본사 반경 150m";
+				}
+				else if(fencingData.event.fencekey.indexOf("YY_") != -1){
+					fencingArea = "여의도역 5호, 9호선 환승지역 반경 150m";
+				}
+				else if(fencingData.event.fencekey.indexOf("KD_") != -1){
+					fencingArea = "공덕역 5호선, 6호선 환승지역 반경 150m";
+				}
+				
+				else if(fencingData.event.fencekey.indexOf("JJ_") != -1){
+					fencingArea = "증산역 6호선 지역 반경 150m";
+				}
+				
+				contensDomString = contensDomString.replace("{EVENT_AREA}", fencingArea);
+				
+				contensDomString = contensDomString.replace("{EVENT_TIME}", time);
+				
+				var contensDom = $(contensDomString);
+				contensDom.css("display", "block");
+				
+
+				/* setTimeout(function(){
+					
+					sendNotification(fencingType, fencingArea);
+					
+				}, 5000);
+				 */
+				
+				 $("#information-panel").append(contensDom);
+				
+				
+			}
+			
+			
+			
+			
+			
+		</script>
+		
+		<script type="text/javascript">
+			// Initialize Firebase
+			// TODO: Replace with your project's customized code snippet
+			var config = {
+			    apiKey: "set Firebase Api Key",
+			    databaseURL: "set Firebase Database Url",
+			    messagingSenderId : "set Message Sender Id"
+		 	};
+		  	
+			firebase.initializeApp(config);
+			
+			var database = firebase.database();
+			
+			
+			var PREFIX_DATA_STORAGE_TRACKING = "Tracking";
+			database.ref(PREFIX_DATA_STORAGE_TRACKING).on('value', function(snapshot){
+				var trackingList = snapshot.val();
+				
+				$Marker.removeAll();
+				
+				for(var key in trackingList){
+					var trackingDataTemp = eval("("+ trackingList[key] +")")
+					drawDetecedActivity(key, trackingDataTemp);
+				}
+				
+			});
+			
+			var PREFIX_DATA_STORAGE_FENCING = "Fencing";
+			database.ref(PREFIX_DATA_STORAGE_FENCING).on('value', function(snapshot){
+				var fencingList = snapshot.val();
+				
+				$("#information-panel").empty();
+				
+				for(var key in fencingList){
+					var fencingDataTemp = eval("("+ fencingList[key] +")")
+					
+					if(fencingDataTemp.event.currentstate == "TRUE"){
+						drawFencingInfo(key, fencingDataTemp);	
+					}
+
+				}
+					
+				
+			});
+			 
+			
+		</script>
+		
+		<script type="text/javascript">
+		
+			const messaging = firebase.messaging();
+		
+		 	var token = null;
+			 
+		 	if ('serviceWorker' in navigator) {
+			  navigator.serviceWorker.register('./firebase-messaging-sw.js')
+			  .then(function(registration) {
+				console.log('Registration successful, scope is:', registration.scope);
+				
+			  }).catch(function(err) {
+			    console.log('Service worker registration failed, error:', err);
+			  });
+			}
+		 
+			function setNotificationPermission(){
+				messaging.requestPermission()
+				.then(function() {
+				  	console.log('Notification permission granted.');
+				  	// TODO(developer): Retrieve an Instance ID token for use with FCM.
+				  	// ...
+				  	setTokenInfo();
+				})
+				.catch(function(err) {
+				  console.log('Unable to get permission to notify.', err);
+				});
+			}
+			
+				
+			function setTokenInfo(){
+				
+				messaging.getToken()
+			    	.then(function(refreshedToken) {
+			    		token = refreshedToken
+			      		console.log('Token refreshed. : ' + token);
+			    		
+			    	})
+			    	.catch(function(err) {
+			      		console.log('Unable to retrieve refreshed token ', err);
+			    	});
+			}
+			
+			
+			setNotificationPermission();
+			
+	 		messaging.onTokenRefresh(function() {
+		 		setTokenInfo(); 
+		 	});
+			
+	 	// request permission on page load
+	 		document.addEventListener('DOMContentLoaded', function () {
+	 		  if (!Notification) {
+	 		    alert('Desktop notifications not available in your browser. Try Chromium.'); 
+	 		    return;
+	 		  }
+
+	 		  if (Notification.permission !== "granted")
+	 		    Notification.requestPermission();
+	 		});
+	 	
+
+	 		function showNotification(title, body) {
+	 			  if (Notification.permission !== "granted")
+	 			    Notification.requestPermission();
+	 			  else {
+	 			    var notification = new Notification(title, {
+	 			      icon: './firebase-logo.png',
+	 			      body: body,
+	 			    });
+
+	 			    notification.onclick = function () {
+	 			      window.open("http://stackoverflow.com/a/13328397/1269037");      
+	 			    };
+
+	 			  }
+
+	 			}
+	 		
+	 		
+	 		function sendNotification(title, body){
+	 			
+	    		var httpRequest = new XMLHttpRequest();
+	    		
+			    httpRequest.open("POST", 'https://fcm.googleapis.com/fcm/send', true);
+			    
+			    httpRequest.setRequestHeader('Content-Type', 'application/json');
+			    httpRequest.setRequestHeader('Authorization', ' key=AIzaSyBxpPbB1kD6sobRJI_iwFmtysJC3fTX_NY');
+			    
+			    var param =  {
+			    	"notification": {
+			        	"title": title,
+			        	"body": body,
+			        	"click_action" : "https://dummypage.com"
+			     	 },
+
+			     	 "to" : token
+			    }
+			    
+			    
+			    httpRequest.onreadystatechange = function(){
+			    	
+	    			console.log("==> httpRequest.readyState : " + httpRequest.readyState);
+	    			console.log("==> httpRequest.status : " + httpRequest.status);
+	    			
+			    	if(httpRequest.readyState == 4) {
+			    		if(httpRequest.status == 200){
+			    			
+		
+			    			console.log("==> httpRequest.responseText : " + httpRequest.responseText);
+			    			
+			         	}
+			        }
+			    }
+			    
+			    httpRequest.send(JSON.stringify(param));
+	 			
+	 		}
+	 		
+	 		var self = this;
+		 	messaging.onMessage(function(payload) {
+			    console.log("Message received. ", payload);
+			    // [START_EXCLUDE]
+			    // Update the UI to include the received message.
+			   // appendMessage(payload);
+			    // [END_EXCLUDE]
+			    showNotification(payload.notification.title, payload.notification.body);
+		  });
+		 	
+		</script>
+		
+	</head>
+  
+  
+	<body>
+	
+		<div id="information-panel-contents-dom" style="display:none;">
+			<div class="information-panel-contents" style="margin-bottom:5px;display:none;">
+				<div style="color:#8C8C8C;font-size:16px;font-weight: bolder;padding: 0px 10px 4px 10px;color: #e7002f;border-bottom:1px solid #e7002f;">{EVENT_TITLE}</div>
+				<div style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">발생지역 :</div>
+				<div style="color:#4C4C4C; font-size:16px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_AREA}</div>
+			
+				<div style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">발생시간 :</div>
+				<div style="color:#4C4C4C; font-size:16px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_TIME}</div>
+				
+			</div>
+		</div>
+			
+		<div id="information-panel"></div>
+   		<div id="map"></div>
+    
+	</body>
+	
+</html>
