@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Google I/O - Machine Learning : Image Analysis</title>
+		<meta name="viewport" content="initial-scale=1.0">
+    	<meta charset="utf-8">
+    	
+    	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+  
+ 		<!-- 2017. 06. 07. : Cho Yonrkyun : Map Library -->
+ 		<link rel="stylesheet" href="./src/view/loading/loading.css" />
+	    <script src="./src/view/loading/loading.js"></script>
+    	
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : DragAndDrop Library -->
+    	<link rel="stylesheet" href="./src/external/dropzone/dropzone.css" />
+    	<link rel="stylesheet" href="./src/external/dropzone/style/style.css" />
+    	<script src="./src/external/dropzone/dropzone.js"></script>
+  
+  
+  		<!-- 2017. 06. 07. : Cho Yonrkyun : DateTimePicker Library -->
+  		<script src="./src/external/moment/moment.js"></script>
+  		<script src="./src/external/combodate/combodate.js"></script>
+  
+  
+  		<!-- 2017. 06. 07. : Cho Yonrkyun : DateTimePicker Library -->
+  		<link rel="stylesheet" href="./src/external/sweetalert2/sweetalert2.min.css" />
+  		<script src="./src/external/sweetalert2/sweetalert2.min.js"></script>
+  		
+  		
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Node.js Request Library -->
+    	<script src="./src/common/machine-learning/machine-learning.js"></script>
+    	
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Util Library -->
+    	<script src="./src/common/util/base64.js"></script>
+    	
+    	<!-- 2017. 06. 07. : Cho Yonrkyun : Map Library -->
+    	<script src="./src/common/map/marker.js"></script>
+    	<script src="./src/common/map/directions.js"></script>
+    	<script src="./src/common/map/distanceMatrix.js"></script>
+    	<script src="./src/common/map/geocode.js"></script>
+    	<script src="./src/common/map/place.js"></script>
+    	<script src="./src/common/map/circle.js"></script>
+    	<script src="./src/common/map/polyline.js"></script>
+    	
+    	
+    	<style>
+			/* Always set the map height explicitly to define the size of the div
+		 	 * element that contains the map.
+		 	 */
+      		#map {
+        	 	display: block;
+				position:absolute;
+				height:auto;
+				bottom:0;
+				top:0;
+				left:0;
+				right:0;
+				background-color: rgba(0, 0, 0, 0.3);
+      		}
+      		
+      		html, body {
+				width   : 100%;
+				height  : 100%;
+				margin  : 0;
+				padding : 0;
+			}
+			
+			select {
+			  
+    			padding: 5px 10px 5px 10px;
+  				border: none;
+  				border-bottom: solid 1px #97BCF9;
+  				transition: border 0.3s;
+  				background-color: rgba(255, 255, 255, 0);
+  				
+  				color: #F6F6F6;
+  				font-size : 14px;
+  				
+  				border-radius : 0px;
+  				-webkit-appearance: none;
+  				
+  				
+			}
+			
+			.combodate {
+				 color: #97BCF9;
+			}
+			
+			.common-display-all-width {
+				width : 100%;
+			}
+		
+			.common-display-all-height{
+				height : 100%;
+			}
+			
+			.common-display-all{
+				width : 100%;
+				height : 100%;
+			}
+			
+			.common-vertical-align-center{
+				position: relative;
+				top: 50%;
+				transform:translateY(-50%);
+			}
+			
+			.custom-dropzone {
+				display: block;
+				position:absolute;
+				height:auto;
+				bottom:0;
+				top:0;
+				left:0;
+				right:0;
+				padding:20px;
+				background-color: rgba(0, 0, 0, 0.3);
+				z-index: 100;
+			}
+			
+			.dropzone {
+				background-color: rgba(255, 255, 255, 0.6);
+				min-height: 300px;
+			}
+			
+			.dropzone .dz-message  {
+				color:#4C4C4C;
+				margin: 6em 0;
+			}
+			
+			.dropzone .dz-preview.dz-image-preview {
+   				background-color: rgba(255, 255, 255, 0);
+			}
+			
+			
+			
+			.dz-filename {
+				font-size : 13px;
+			    margin-bottom: 0.3em;
+		        font-weight : bolder !important;
+			}
+			
+			.dz-size {
+				font-size : 11px !important;
+		    	margin-bottom: 0.3em;
+	    	    font-weight : bolder !important;
+			}
+			
+		   .dropzone .dz-preview .dz-details .dz-filename span, .dropzone .dz-preview .dz-details .dz-size span {
+        		background-color: rgba(255, 255, 255, 0.3);
+        		padding: 0 0.4em;
+        		border-radius: 3px; 
+        	}	
+			
+			.dz-remove {
+				font-size : 13px;
+			    margin-bottom: initial;
+			    color : #ffffff;
+			    font-weight : bolder;
+			}
+			
+			.dz-remove-button{
+				 background-color : rgba(186, 43, 43, 1);
+				 padding-left : 4px;
+				 padding-right : 4px;
+				 padding-top : 3px;
+				 padding-bottom : 3px;	
+				 border-radius: 3px; 
+			}
+			
+			
+			
+			#information-panel{
+				width: 350px;
+			    
+			    background-color: rgba(255, 255, 255, 1);
+			    position: absolute;
+			    top: 0px;
+			    left: 0px;
+			    z-index: 90;
+			    
+			    box-shadow: 0 0 20px rgba(0,0,0,0.3);;
+			    
+			    overflow:hidden;
+			}
+			
+			#direction-panel{
+				padding : 10px 10px 10px 10px;
+				background: #4285F4 !important;
+				
+				width:100%;
+				height:290px;
+					
+			}
+			
+			#direction-panel table{
+				margin-bottom:5px;
+			}
+			
+			#direction-panel .title{
+				width: 18px;
+				vertical-align: middle;
+			}
+			
+			#direction-panel td{
+				vertical-align: middle;
+			}
+			
+			
+			
+			#direction-panel .contents{
+				width: 300px;
+				vertical-align: middle;
+				padding-right:5px;
+			}
+			
+			.title-text{
+				color: #EEEEEE;
+			    font-size: 16px;
+			    font-weight:bolder;
+			}
+			
+			.option-button{
+				height: 36px;
+			    width: 36px;
+			    padding-top:1px;
+			}
+			
+			.option-button:hover,
+			.option-button.hover
+			{
+				border-radius: 100%;
+			    background-color: #3367D6;
+			}
+			
+			.direction-mode-icon{
+				background-image: url(http://maps.gstatic.com/tactile/directions/omnibox/directions-2x-20150929.png);
+				background-size: 96px 216px;
+			    width: 24px;
+			    height: 24px;
+			    margin: 4px 6px 6px 6px;
+			}
+			
+			.direction-mode-driving-icon{
+				background-position: -48px -96px;
+			}
+			
+			.direction-mode-driving-icon:hover,
+			.direction-mode-driving-icon.hover{
+				background-position: -24px -96px;
+			}
+	
+			.direction-mode-transit-icon{
+			   background-position: -48px -120px;
+    		}
+	
+			.direction-mode-transit-icon:hover,
+			.direction-mode-transit-icon.hover{
+			   background-position: -24px -120px;
+    		}
+    		
+			.direction-mode-walking-icon{
+			    background-position: -48px -144px;
+			}
+			
+			.direction-mode-walking-icon:hover,
+			.direction-mode-walking-icon.hover{
+			    background-position: -24px -144px;
+			}
+			
+			.direction-mode-bicycling-icon{
+				background-position: -48px -168px;
+			}
+			
+			.direction-mode-bicycling-icon:hover,
+			.direction-mode-bicycling-icon.hover{
+				background-position: -24px -168px;
+			}
+			
+			
+			
+			.input-text-underline {
+  				padding: 10px 10px 10px 10px;
+  				border: none;
+  				border-bottom: solid 1px #97BCF9;
+  				transition: border 0.3s;
+  				background-color: rgba(255, 255, 255, 0);
+  				
+  				color: #F6F6F6;
+  				font-size : 14px;
+			}	
+			
+			
+			.input-text-underline::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+			    color: #97BCF9;
+			}
+			.input-text-underline:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+			   	color: #97BCF9;
+			   	opacity:  1;
+			}
+			.input-text-underline::-moz-placeholder { /* Mozilla Firefox 19+ */
+			   	color: #97BCF9;
+			   	opacity:  1;
+			}
+			.input-text-underline:-ms-input-placeholder { /* Internet Explorer 10-11 */
+			   	color: #97BCF9;
+			}
+			.input-text-underline::-ms-input-placeholder { /* Microsoft Edge */
+			   	color: #97BCF9;
+			}
+
+			.input-text-underline:focus ,
+			.input-text-underline .focus {
+			 	outline: none;
+  				border-bottom: solid 2px #F6F6F6;
+  				color: #F6F6F6;
+			}
+			  		
+			  		
+	  		.waypoint-icon {
+			    background-image: url(http://maps.gstatic.com/tactile/directions/omnibox/directions-2x-20150929.png);
+			    background-size: 96px 216px;
+    			width: 24px;
+    			height: 24px;
+    			margin-top: 3px;
+    			margin-bottom: 1px;
+    			
+			}
+			
+			
+			.waypoint-icon-start {
+			    background-position: 0px -48px;
+			
+			}
+			
+			.waypoint-icon-end {
+			    background-position: -24px -48px;
+			
+			}
+
+			.search-position{
+				background-image: url(./img/search-map-icon.png);
+				background-size: 24px 24px;
+			    width: 24px;
+    			height: 24px;
+    			float:right;
+    			margin-top: 9px;
+    			margin-bottom: 1px;
+			}
+			
+			.search-position:hover{
+				background-image: url(./img/search-map-icon-hover.png);
+				background-size: 28px 28px;
+			    width : 28px;
+    			height: 28px;
+    			margin-top: 5px;
+    			margin-bottom: 1px;
+			}
+			
+			.search-button{
+				background-color: #4CAF50;
+			    border: none;
+			    color: white;
+			    padding: 10px 16px;
+			    text-align: center;
+			    text-decoration: none;
+			    display: inline-block;
+			    font-size: 16px;
+			    margin: 4px 2px;
+			    cursor: pointer;
+			}
+			
+			.search-button:hover{
+				background-color: #469840;
+				outline: none;
+			
+			}
+			
+			
+			#directions-display-panel {
+			 	width : 100%;
+			 	overflow-x:hidden;
+	 		    overflow-y:auto;
+			}
+			
+			.date-icon {
+    			
+			    background-image: url(http://maps.gstatic.com/tactile/directions/transit_calendar/date-picker-2x.png);
+				background-size: 12px 12px;
+			    width: 24px;
+    			height: 24px;
+    			float:right;
+    			margin-top: 9px;
+    			margin-bottom: 1px;
+    			background-repeat: no-repeat;
+    			background-position: center; 
+    
+			}
+			
+			
+			.ui-datepicker th {
+				padding : initial;
+			}
+			
+			.ui-datepicker table {
+			    font-size: .6em;
+			}
+			
+			.ui-datepicker table th {
+			    font-size: 0.9rem;
+			
+			}
+			
+			
+			#directions-display-panel{
+				    
+			    padding :10px; 
+   			    background-color: rgba(0, 0, 0, 0.7);
+			    /*display:none;*/
+			}
+			
+			.direction-contents {
+			
+			    background-color: #F6F6F6;
+			    margin-top: 0px;
+			    
+			    margin-bottom: 0px;
+			    
+			    margin-left: 0px;
+			    margin-right: 0px;
+			    
+			    padding : 10px 0px 10px 0px;
+			    
+			    -webkit-border-top-right-radius: 2px;
+			    -webkit-border-bottom-left-radius: 2px;
+			    -webkit-border-top-left-radius: 5px;
+			    -webkit-border-bottom-right-radius: 5px;
+			    -moz-border-top-right-radius: 2px;
+			    -moz-border-bottom-left-radius: 2px;
+			    -moz-border-top-left-radius: 5px;
+			    -moz-border-bottom-right-radius: 5px;
+			    border-top-right-radius: 2px;
+			    border-bottom-left-radius: 2px;
+			    border-top-left-radius: 5px;
+			    border-bottom-right-radius: 5px;
+			    
+			}
+
+
+
+
+					
+		</style>
+		
+		<script>
+			
+			var $Data = new Object();
+			
+			$(document).ready(function() { 
+				
+				var windowInnerHeight = window.innerHeight;
+				var directionsPanelHeight = parseInt($("#direction-panel").css("height").replace("px", ""));
+				var directionsDisplayPanelHeight = windowInnerHeight - directionsPanelHeight;
+				
+				$("#directions-display-panel").css("height", directionsDisplayPanelHeight);
+				$("#directions-display-panel").css("display", "none");
+				
+			/* 	$.datepicker.setDefaults( $.datepicker.regional[ "kr" ] );
+				$.datepicker.setDefaults( $.datepicker.regional[ "kr" ] );
+				$( "#search-start-date" ).datetimepicker({
+				    dateFormat: 'yy/mm/dd'
+				  });
+				 */
+				 
+				 $('#search-start-date').combodate({
+					    minYear   : 1975
+					  , maxYear   : 2117
+					  , minuteStep: 10
+					  , format: 'MM-DD-YYYY HH:mm',
+				 });
+				 
+				
+				
+				 $('#search-start-date').combodate("setValue", new Date());   
+				
+			});
+			
+		
+		</script>
+    
+    	<script>
+      		var map;
+      		
+      		function initMap() {
+        		map = new google.maps.Map(document.getElementById('map'), {
+          			  center: {lat: 51.5048303, lng: -0.0808151}
+          			, zoom: 11
+          			, mapTypeControl: true
+          		    , mapTypeControlOptions: {
+          		          style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
+          		        , position: google.maps.ControlPosition.TOP_RIGHT
+          		    }
+          			
+        		});
+        		
+        		$Marker.init(map);
+        		
+        		$Direction.init(map, "directions-display-panel"); 
+        		
+				$Data.travelMode = google.maps.TravelMode["DRIVING"];
+				
+				$Place.init(map);
+				
+				
+				$Circle = {
+					  map : null
+					, cicleList : null
+					, init : function(map){
+						this.map = map;
+						this.cicleList = new Array();
+					}
+					, draw :function(lat, lng, radius){
+						
+						var circleOptions = {
+		       				strokeColor: '#FFFFFF',
+		       	            strokeOpacity: 1.0,
+		       	            strokeWeight: 0,
+		       	            fillColor: '#6799FF',
+		       	            fillOpacity: 0.4,
+		       	            radius: radius	
+		        		};
+						
+							
+		        		var circleData = new Circle(this.map, circleOptions);
+		        		circleData.setCenter(lat, lng);
+		        		circleData.draw();
+		        		
+		        		this.cicleList.push(circleData);
+		        		
+					}
+					, clear : function(){
+						for(var index = 0 ; index < this.cicleList.length ; index++){
+							var circleTemp = this.cicleList[index];
+							circleTemp.remove();
+						}
+					}
+				}
+				$Circle.init(map);
+				
+				
+				$Line = {
+					  map : null
+					, lineList : null
+					, init : function(map){
+						this.map = map;
+						this.lineList = new Array();
+					}
+					, draw :function(strokeColor, strokeWeight, coordinates){
+						
+						var polylineOptions = {
+							geodesic: true,
+							strokeColor: strokeColor,
+							strokeOpacity: 0.7,
+							strokeWeight: strokeWeight,
+		       	        };
+		        			
+		        		var polylineData = new Polyline(this.map, polylineOptions);
+		        		polylineData.setCoordinates(coordinates);
+		        		polylineData.draw();
+		        		
+		        		this.lineList.push(polylineData);
+		        		
+					}
+					, clear : function(){
+						for(var index = 0 ; index < this.lineList.length ; index++){
+							var lineTemp = this.lineList[index];
+							lineTemp.remove();
+						}
+					}
+				}
+				
+				$Line.init(map);
+					
+      		}
+      		
+    	</script>
+  
+    	<script src="https://maps.googleapis.com/maps/api/js?key=API_KEY" async defer></script>
+		
+		<script>
+		
+		
+			function showDropZone(event){
+				
+				var dropZone = document.getElementById("dropZone");
+				dropZone.style.display = "block";
+				
+				if(event != null){
+					event.stopPropagation();
+			    	event.preventDefault();
+				}
+			};
+			
+			
+			function hideDropZone(event){
+				
+				var dropZone = document.getElementById("dropZone");
+				dropZone.style.display = "none";
+				
+				if(event != null){
+					event.stopPropagation();
+			    	event.preventDefault();
+				}
+			};
+			
+			
+		</script>
+	
+	</head>
+  
+  
+	<body>
+  
+  		<div id="main" class="common-display-all" ondragover="showDropZone(event)" >
+			
+	 		<div id="dropZone" class="custom-dropzone" style="display:none;" ondrop="hideDropZone(event)" ondragend="hideDropZone(event)" ondragexit="hideDropZone(event)">
+ 				<form action="/upload" class="dropzone needsclick dz-clickable common-vertical-align-center" id="dropForm" >
+					<div class="dz-message needsclick common-display-all">
+						Drop files here to upload.
+					</div>
+				</form>
+	
+			</div>
+				
+		    <div id="map"></div>
+  
+  			<div id="information-panel">
+  			  	
+  			  	<div id="direction-panel">
+  				
+  					<div class="title-text" style="margin-left:10px;">위치정보 : </div>
+  					<!-- 출발 위치 정보 --> 
+	  				<table>
+	  			  		
+	  			  		<tr>
+	  			  			<td class="title">
+	  			  				<div class="waypoint-icon waypoint-icon-start"></div>
+	  			  			</td>
+	  			  			<td class="contents">
+	  			  				<input id="search-position-start" type="text" placeholder="출발지를 입력하거나 지도를 클릭하세요." class="input-text-underline" style="width:265px;">
+	  			  				<div class="search-position" onclick="onClickSetStartPosition()"></div>
+	  			  				<script>
+	  			  					function onClickSetStartPosition(){
+	  			  				    	
+	  			  						map.setOptions({ draggableCursor: 'url(./img/position-marker-start-cur.png), auto', draggingCursor: 'url(./img/position-marker-start-cur.png), auto'});
+	  			  					
+	  			  						google.maps.event.addListener(map, 'click', function(event) {
+	  			  							
+	  			  							$Loading.show();
+	  			  						
+	  			  							google.maps.event.clearListeners(map, 'click');
+	  			  							
+	  			  			          		console.log("==> onClickSetStartPosition : ", event);
+	  			  			          		
+	  			  			          		var options = {
+		  										  lat   : event.latLng.lat()
+												, lng   : event.latLng.lng()
+	  			  			          		}
+	  			  			          		
+	  			  			          		$Geocode.getAddress(options, function(result){
+	  			  			          			
+	  			  			          			var data = {
+	  			  			          				address : result.formatted_address
+	  			  			          			}
+	  			  			          			
+		  			  			          		$Marker.draw({
+				  									  lat   : result.geometry.location.lat()
+				  									, lng   : result.geometry.location.lng()
+				  									, isStartPosition : true
+				  									, data : data
+				  								});
+		  			  			          		
+		  			  			          		document.getElementById("search-position-start").value = result.formatted_address;
+		  			  			          			 
+		  			  			          		$Loading.close();
+		  			  						
+	  			  			          		})
+		  			  			          	
+			  								
+	  			  			          		setTimeout(function(){
+	  			  			          			map.setOptions({ draggableCursor: null, draggingCursor: null});
+	  			  			          		}, 500);
+	  			  			          	 	
+	  			  			        	});
+
+	  			  					}
+	  			  				</script>
+	  			  			</td>
+	  			  		</tr>
+  			  		</table>
+  			  		
+  			  		<!-- 도착 위치 정보 -->
+		  			<table>
+	  			  		<tr>
+	  			  			<td class="title">
+	  			  				<div class="waypoint-icon waypoint-icon-end"></div>
+	  			  			</td>
+	  			  			<td class="contents">
+	  			  				<input id="search-position-end" type="text" placeholder="도착지를 입력하거나 지도를 클릭하세요." class="input-text-underline" style="width:265px;">
+	  			  				<div class="search-position" onclick="onClickSetEndPosition()"></div>
+	  			  				<script>
+	  			  					function onClickSetEndPosition(){
+	  			  				    	
+	  			  						map.setOptions({ draggableCursor: 'url(./img/position-marker-end-cur.png), auto', draggingCursor: 'url(./img/position-marker-end-cur.png), auto'});
+	  			  					
+	  			  						google.maps.event.addListener(map, 'click', function(event) {
+	  			  							
+	  			  							$Loading.show();
+	  			  						
+	  			  							google.maps.event.clearListeners(map, 'click');
+	  			  							
+	  			  			          		console.log("==> onClickSetStartPosition : ", event);
+	  			  			          		
+	  			  			          		var options = {
+		  										  lat   : event.latLng.lat()
+												, lng   : event.latLng.lng()
+	  			  			          		}
+	  			  			          		
+	  			  			          		$Geocode.getAddress(options, function(result){
+	  			  			          			
+	  			  			          			var data = {
+	  			  			          				address : result.formatted_address
+	  			  			          			}
+	  			  			          			
+		  			  			          		$Marker.draw({
+				  									  lat   : result.geometry.location.lat()
+				  									, lng   : result.geometry.location.lng()
+				  									, isEndPosition : true
+				  									, data : data
+				  								});
+		  			  			          		
+		  			  			          		document.getElementById("search-position-end").value = result.formatted_address;
+		  			  			          			 
+		  			  			          		$Loading.close();
+		  			  						
+	  			  			          		})
+		  			  			          	
+			  								
+	  			  			          		setTimeout(function(){
+	  			  			          			map.setOptions({ draggableCursor: null, draggingCursor: null});
+	  			  			          		}, 500);
+	  			  			          	 	
+	  			  			        	});
+
+	  			  					}
+	  			  				</script>
+	  			  			</td>
+	  			  		</tr>
+	  			  		
+	  			  	</table>
+	  			  	
+	  			  	<!--출발일 -->
+	  			  	<table   style="margin-bottom:20px;">
+	  			  		
+	  			  		<tr>
+	  			  			<td class="title">
+	  			  				<div class="date-icon"></div>
+	  			  			</td>
+	  			  			<td class="contents" style="padding-left:3px;">
+	  			  				<!--  
+	  			  				<input id="search-start-date" type="text" placeholder="출발일시를 입력하세요." class="input-text-underline" style="width:265px;">
+	  			  				-->
+	  			  				<input type="text" id="search-start-date" data-format="MM-DD-YYYY HH:mm" data-template="YYYY / MM / DD   HH : mm" name="datetime" value="21-12-2012 20:30">
+	  			  				
+	  			  			</td>
+	  			  		</tr>
+  			  		</table>
+  			  		
+  			  		
+  			  		
+  			  		
+  			  		
+	  			  	<!-- 이동 수단 정보 -->
+		  			<table style="">
+	  			  		<tr>
+	  			  			<td style="padding:0px 0px 0px 10px;">
+	  			  				<div class="title-text">이동수단 : </div>
+	  			  			</td>
+	  			  			<td style="padding:0px 0px 0px 15px;">
+	  			  				<div id="direction-mode-driving" class="option-button hover" onclick="onClickSetTravelMode('driving')">
+		  							<div id="direction-mode-driving-icon" class="direction-mode-icon direction-mode-driving-icon hover"></div>
+		  						</div>
+		  					</td>	
+		  					<td style="padding:0px 0px 0px 5px;">
+		  						<div id="direction-mode-transit" class="option-button" onclick="onClickSetTravelMode('transit')">
+		  							<div id="direction-mode-transit-icon" class="direction-mode-icon direction-mode-transit-icon"></div>
+		 						</div>
+		 					</td>	
+		  					<td style="padding:0px 0px 0px 5px;">	
+		 						<div id="direction-mode-walking" class="option-button" onclick="onClickSetTravelMode('walking')">
+		  							<div id="direction-mode-walking-icon" class="direction-mode-icon direction-mode-walking-icon"></div>
+		  						</div>
+		  					</td>	
+		  					<td style="padding:0px 0px 0px 5px;">	
+		  						<div id="direction-mode-bicycling" class="option-button" onclick="onClickSetTravelMode('bicycling')">
+		  							<div id="direction-mode-bicycling-icon" class="direction-mode-icon direction-mode-bicycling-icon"></div>
+		  						</div>
+	  			  			</td>
+	  			  		</tr>
+	  			  	</table>
+	  			  	<script>
+	  			  	
+	  			  		function onClickSetTravelMode(mode){
+							
+	  			  			
+	  			  			if(mode == "driving"){
+	  			  				
+	  			  				$Data.travelMode = google.maps.TravelMode["DRIVING"]
+	  			  				
+	  			  				$("#direction-mode-driving").addClass("hover");
+	  			  				$("#direction-mode-driving-icon").addClass("hover");
+	  			  				
+	  			  				$("#direction-mode-transit").removeClass("hover");
+	  			  				$("#direction-mode-transit-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-walking").removeClass("hover");
+	  			  				$("#direction-mode-walking-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-bicycling").removeClass("hover");
+	  			  				$("#direction-mode-bicycling-icon").removeClass("hover");
+	  			  			}
+	  			  			else if(mode == "transit"){
+	  			  				$Data.travelMode = google.maps.TravelMode["TRANSIT"]
+	  			  				
+	  			  				$("#direction-mode-driving").removeClass("hover");
+	  			  				$("#direction-mode-driving-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-transit").addClass("hover");
+	  			  				$("#direction-mode-transit-icon").addClass("hover");
+	  			  				
+	  			  				$("#direction-mode-walking").removeClass("hover");
+	  			  				$("#direction-mode-walking-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-bicycling").removeClass("hover");
+	  			  				$("#direction-mode-bicycling-icon").removeClass("hover");
+	  			  			}
+		  			  		else if(mode == "walking"){
+		  			  			$Data.travelMode = google.maps.TravelMode["WALKING"]
+		  			  			
+		  			  			$("#direction-mode-driving").removeClass("hover");
+	  			  				$("#direction-mode-driving-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-transit").removeClass("hover");
+	  			  				$("#direction-mode-transit-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-walking").addClass("hover");
+	  			  				$("#direction-mode-walking-icon").addClass("hover");
+	  			  				
+	  			  				$("#direction-mode-bicycling").removeClass("hover");
+	  			  				$("#direction-mode-bicycling-icon").removeClass("hover");
+	  			  			}
+		  			  		else if(mode == "bicycling"){
+		  			  			$Data.travelMode = google.maps.TravelMode["BICYCLING"]
+		  			  			
+		  			  			$("#direction-mode-driving").removeClass("hover");
+	  			  				$("#direction-mode-driving-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-transit").removeClass("hover");
+	  			  				$("#direction-mode-transit-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-walking").removeClass("hover");
+	  			  				$("#direction-mode-walking-icon").removeClass("hover");
+	  			  				
+	  			  				$("#direction-mode-bicycling").addClass("hover");
+	  			  				$("#direction-mode-bicycling-icon").addClass("hover");
+				  			}
+	  			  		}
+	  			  	
+	  			  	</script>
+	  			  	
+	  			  	
+  			  		<button class="search-button" style="width:100%;margin-top:10px;" onclick="onClickSetDirection()">Direction</button>
+  			  		<script>
+  			  		
+  			  			function onClickSetDirection(){
+  			  				runDirection();
+  			  			}
+  			  		
+  			  		</script>
+  			
+  				</div>
+		  			
+		  			
+				<div id="direction-contents-dom" style="display:none;">
+					<div class="direction-contents" style="margin-bottom:5px;">
+						<div style="color:#8C8C8C;font-size:16px;font-weight: bolder;padding: 0px 10px 4px 10px;margin:0px 0px 5px 0px; color: #e7002f;border-bottom:1px solid #e7002f;">{EVENT_TITLE}</div>
+						
+						
+						<table>
+							<tr>
+								<td style="width:65px">
+									<span style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">일정일시 :</span>
+								</td>
+								<td>
+									<div style="color:#4C4C4C; font-size:15px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_ARRIVE_DATE}</div>
+									<div style="color:#4C4C4C; font-size:15px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_ARRIVE_TIME}</div>
+								</td>
+							</tr>
+							
+							<tr>
+								<td style="width:65px">
+									<span style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">출발주소 :</span>
+								</td>
+								<td>
+									<div style="color:#4C4C4C; font-size:14px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_START_ADDRESS}</div>
+								</td>
+							
+							</tr>
+							
+							<tr>
+								<td style="width:65px">
+									<span style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">도착주소 :</span>
+								</td>
+								<td>
+									<div style="color:#4C4C4C; font-size:14px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_END_ADDRESS}</div>
+								</td>
+							
+							</tr>
+							
+							<tr class="direction-contents-show">
+								<td style="width:65px">
+									<span style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">{EVENT_SHOW_TITLE}</span>
+								</td>
+								<td>
+									<div style="color:#4C4C4C; font-size:14px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_SHOW_TIME}</div>
+								</td>
+							
+							</tr>
+							
+							<tr class="direction-contents-event" style="display:none;">
+								<td style="width:65px">
+									<span style="color:#8C8C8C;font-size:13px;padding: 5px 0px 0px 10px;height:25px;">특이사항 :</span>
+								</td>
+								<td>
+									<div style="color:#4C4C4C; font-size:14px;font-weight: bolder;padding: 0px 0px 0px 10px;">{EVENT_INFO}</div>
+								</td>
+							</tr>
+							
+						
+						</table>
+						
+					</div>
+				</div>
+				
+  				<div id="directions-display-panel"></div>
+  			</div>	
+  				
+		</div>
+		
+	
+	
+		<script>	
+			
+			Dropzone.autoDiscover = false;
+			
+			
+			var preview = "<div class=\"dz-preview dz-file-preview\">\n"
+			 			+ "	 <div class=\"dz-image\"><img data-dz-thumbnail /></div>\n"
+			 			+ "  <div class=\"dz-details\">\n"
+			 			+ "    <div class=\"dz-filename\"><span data-dz-name></span></div>\n"
+			 			+ "    <div class=\"dz-size\"><span data-dz-size></span></div>\n"
+			 			//+ "    <div class=\"dz-remove\"><span class=\"dz-remove-button\">remove</span></div>\n"
+			 			+ "  </div>\n"
+			 			+ "  <div class=\"dz-progress\"><span class=\"dz-upload\" data-dz-uploadprogress></span></div>\n"
+			 			+ "  <div class=\"dz-error-message\"><span data-dz-errormessage></span></div>\n"
+			 			+ "  <div class=\"dz-success-mark\">\n"
+			 			+ "    <svg width=\"54px\" height=\"54px\" viewBox=\"0 0 54 54\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:sketch=\"http://www.bohemiancoding.com/sketch/ns\">\n"
+			 			+ "      <title>Check</title>\n"
+			 			+ "      <defs></defs>\n"
+			 			+ "      <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" sketch:type=\"MSPage\">\n"
+			 			+ "        <path d=\"M23.5,31.8431458 L17.5852419,25.9283877 C16.0248253,24.3679711 13.4910294,24.366835 11.9289322,25.9289322 C10.3700136,27.4878508 10.3665912,30.0234455 11.9283877,31.5852419 L20.4147581,40.0716123 C20.5133999,40.1702541 20.6159315,40.2626649 20.7218615,40.3488435 C22.2835669,41.8725651 24.794234,41.8626202 26.3461564,40.3106978 L43.3106978,23.3461564 C44.8771021,21.7797521 44.8758057,19.2483887 43.3137085,17.6862915 C41.7547899,16.1273729 39.2176035,16.1255422 37.6538436,17.6893022 L23.5,31.8431458 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z\" id=\"Oval-2\" stroke-opacity=\"0.198794158\" stroke=\"#747474\" fill-opacity=\"0.816519475\" fill=\"#FFFFFF\" sketch:type=\"MSShapeGroup\"></path>\n"
+			 			+ "      </g>\n"
+			 			+ "    </svg>\n"
+			 			+ "  </div>\n"
+			 			+ "  <div class=\"dz-error-mark\">\n"
+			 			+ "    <svg width=\"54px\" height=\"54px\" viewBox=\"0 0 54 54\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:sketch=\"http://www.bohemiancoding.com/sketch/ns\">\n"
+			 			+ "      <title>Error</title>\n"
+			 			+ "      <defs></defs>\n"
+			 			+ "      <g id=\"Page-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" sketch:type=\"MSPage\">\n"
+			 			+ "        <g id=\"Check-+-Oval-2\" sketch:type=\"MSLayerGroup\" stroke=\"#747474\" stroke-opacity=\"0.198794158\" fill=\"#FFFFFF\" fill-opacity=\"0.816519475\">\n"
+			 			+ "          <path d=\"M32.6568542,29 L38.3106978,23.3461564 C39.8771021,21.7797521 39.8758057,19.2483887 38.3137085,17.6862915 C36.7547899,16.1273729 34.2176035,16.1255422 32.6538436,17.6893022 L27,23.3431458 L21.3461564,17.6893022 C19.7823965,16.1255422 17.2452101,16.1273729 15.6862915,17.6862915 C14.1241943,19.2483887 14.1228979,21.7797521 15.6893022,23.3461564 L21.3431458,29 L15.6893022,34.6538436 C14.1228979,36.2202479 14.1241943,38.7516113 15.6862915,40.3137085 C17.2452101,41.8726271 19.7823965,41.8744578 21.3461564,40.3106978 L27,34.6568542 L32.6538436,40.3106978 C34.2176035,41.8744578 36.7547899,41.8726271 38.3137085,40.3137085 C39.8758057,38.7516113 39.8771021,36.2202479 38.3106978,34.6538436 L32.6568542,29 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z\" id=\"Oval-2\" sketch:type=\"MSShapeGroup\"></path>\n"
+			 			+ "        </g>\n"
+			 			+ "      </g>\n"
+			 			+ "    </svg>\n"
+			 			+ "  </div>\n"
+			 			+ "</div>";
+
+			var dropManager = new Dropzone("#dropForm", {
+				    uploadMultiple : true
+				  , previewTemplate : preview
+			});
+			
+			console.log("==> dropManager : ", dropManager);
+			
+
+			var minSteps = 6,
+			    maxSteps = 60,
+			    timeBetweenSteps = 100,
+			    bytesPerStep = 100000;
+
+			dropManager.uploadFiles = function(files) {
+				
+				var self = this;
+				
+			    for (var i = 0; i < files.length; i++) {
+
+					var file = files[i];
+					var totalSteps = Math.round(Math.min(maxSteps, Math.max(minSteps, file.size / bytesPerStep)));
+
+					for (var step = 0; step < totalSteps; step++) {
+			        	var duration = timeBetweenSteps * (step + 1);
+			        	setTimeout(function(file, totalSteps, step) {
+			          		return function() {
+			            		file.upload = {
+				              		progress: 100 * (step + 1) / totalSteps,
+				              		total: file.size,
+				              		bytesSent: (step + 1) * file.size / totalSteps
+			            		};
+
+				           		self.emit('uploadprogress', file, file.upload.progress, file.upload.bytesSent);
+				            	if (file.upload.progress == 100) {
+				              		file.status = Dropzone.SUCCESS;
+				              		self.emit("success", file, 'success', null);
+				              		self.emit("complete", file);
+				              		self.processQueue();
+				            	}
+			          		};
+			        	}(file, totalSteps, step), duration);
+			      	}
+			    }
+		       
+			}
+			
+			dropManager.on("addedfile", function(file){
+				
+				for(var index = 0  ; index < dropManager.files.length ; index++){
+					
+					var fileTemp = dropManager.files[index];
+				
+					if(fileTemp.name == file.name){
+						if(fileTemp.size == file.size){
+							
+							var itemCount = 0;
+							for(var index2 = 0  ; index2 < dropManager.files.length ; index2++){
+								
+								var fileTemp2 = dropManager.files[index2];
+								if(fileTemp.name == fileTemp2.name){
+									if(fileTemp.size == fileTemp2.size){
+										itemCount = itemCount + 1;
+									}
+								}
+							}
+							
+							if(itemCount > 1){
+								dropManager.removeFile(file);
+							}
+						}
+					}
+				}
+			
+			}); 
+			
+			
+			// Hide the total progress bar when nothing's uploading anymore
+			var processCount = 0;
+			var totalCount = 0;
+			dropManager.on("queuecomplete", function(progress) {
+				console.log("==> queuecomplete");
+				
+				totalCount = dropManager.files.length;
+				
+				$Loading.show();
+				
+				for(var index = 0 ; index < dropManager.files.length ; index++){
+					
+					var dataId = "id" + index;
+					var fileItem = dropManager.files[index];
+					$Data[dataId] = {
+						fileItem : 	fileItem
+					}
+					
+					var imageData = fileItem.dataURL.split(",");
+					
+					var paramData = {
+						  id   : dataId
+						, data : imageData[1]
+						, file : fileItem
+					}
+						
+				
+					var callbackObject = $ML.setCallback(function(reponse){
+						
+						
+						$Data[reponse.id].detection = reponse.detections[0];
+						var data = $Data[reponse.id].fileItem;
+						//var data = $Data[reponse.id];
+					
+						
+				 		var detection = reponse.detections[0];
+						var landmarkAnnotation = detection.landmarkAnnotations[0];
+						
+						var location = landmarkAnnotation.locations[0];
+						
+						$Marker.draw({
+							  title : landmarkAnnotation.description
+							, lat   : location.latLng.latitude
+							, lng   : location.latLng.longitude
+							, isWayPoint : true
+							, data  : data
+							, detection : detection
+						});
+						
+						processCount = processCount + 1;
+						$Loading.progress(processCount, totalCount);
+						
+						if(processCount == totalCount){
+							$Loading.close();
+							processCount = 0;
+							totalCount = 0;
+							
+							//$Direction.route();
+							$Loading.close();
+							
+						}
+					});
+					
+					$ML.vision(paramData, callbackObject);
+					
+				}
+							
+				setTimeout(function(){
+					dropManager.removeAllFiles();
+					hideDropZone();	
+				}, 500)
+				
+			});
+			
+			
+			function runDirection(){
+				
+				$Place.clear();
+				$Circle.clear();
+				$Line.clear();
+				
+				var departureTime = new Date($('#search-start-date').combodate("getValue"));
+				
+				if( ($Marker.wayPoint.length == 0) && ($Marker.startPosition == null) ){
+					swal('Warning', '출발정보 및 경유지 정보가 없습니다.', 'error');
+					return;	
+				}
+				
+				if( ($Marker.wayPoint.length == 0) && ($Marker.endPosition == null) ){
+					swal('Warning', '도착정보 및 경유지 정보가 없습니다.', 'error');
+					return;	
+				}
+				
+				   
+				$Loading.show();
+				var origin = null;
+				var originIndex = -1;
+				if($Marker.startPosition != null){
+					origin = $Marker.startPosition.position;
+				}
+				else{
+					
+					
+					var minTime = Number.MAX_VALUE;
+					for(var index = 0 ; index < $Marker.wayPoint.length ; index++){
+						
+						var dataTemp = $Marker.wayPoint[index].options.data;
+						
+						if(dataTemp.lastModified < minTime){
+							minTime = dataTemp.lastModified;
+							originIndex = index
+							
+						}
+						
+					}
+					
+					origin = $Marker.wayPoint[originIndex].position;
+				}
+				
+				var destination = null;
+				var destinationIndex = -1;
+				if($Marker.endPosition != null){
+					destination = $Marker.endPosition.position;
+				}
+				else{
+					
+					if($Marker.startPosition == null){
+						var maxTime = Number.MIN_VALUE;
+						for(var index = 0 ; index < $Marker.wayPoint.length ; index++){
+							
+							var dataTemp = $Marker.wayPoint[index].options.data;
+							if(dataTemp.lastModified > maxTime){
+								maxTime = dataTemp.lastModified;
+								destinationIndex = index
+								
+							}
+							
+						}
+						
+						destination = $Marker.wayPoint[destinationIndex].position;
+					}
+					else{
+						destination = $Marker.startPosition.position;
+					}
+				}
+				
+				var waypoints    = new Array();
+				var waypointsDetail    = new Array();
+				
+				for(var index = 0 ; index < $Marker.wayPoint.length ; index++){
+					
+					if( (index != originIndex) && (index != destinationIndex) ){
+						waypoints.push({
+							  location : $Marker.wayPoint[index].position
+							, stopover: true
+						});
+						
+						waypointsDetail.push($Marker.wayPoint[index]);
+					}
+				}
+				
+				
+				var routeTest = false;
+				var renderPath = false;
+				if(waypoints.length == 0){
+					routeTest = true;
+					renderPath = false;
+				}
+				console.log("===> origin : " + originIndex + " : ", origin);
+				console.log("===> destination : " + destinationIndex + " : ", destination);
+				console.log("===> waypoint : ", waypoints);
+				
+				
+				var options ={
+					  origin : origin
+					, destination : destination
+					, waypoints : waypoints
+					, waypointsDetail : waypointsDetail
+					, travelMode : $Data.travelMode
+					, departureTime : departureTime
+					, displayPanel  : false
+					, routeTest     : routeTest
+					, renderPath    : renderPath
+				}
+				
+				
+				
+				if(originIndex == -1){
+					options.originDetail = $Marker.startPosition;
+				}
+				else{
+					options.originDetail = $Marker.wayPoint[originIndex]
+				}
+				
+				if(destinationIndex == -1){
+					options.destinationDetail = $Marker.endPosition;
+				}
+				else{
+					options.destinationDetail = $Marker.wayPoint[destinationIndex]
+				}
+				
+				
+				function setTravelDirectionDetailContents(routeData, options){
+					
+					
+					console.log("==> setDirectionDetailContents : options : ", options);
+					
+					var departureTime = options.departureTime
+					for(var index = 0 ; index < routeData.legs.length ; index++){
+						
+						var legTemp = routeData.legs[index];
+						
+						var wayPointData = null;
+						if(index >= routeData.waypoint_order.length){
+							wayPointData = options.destinationDetail.options;
+						}
+						else{
+							var waypointIndex = routeData.waypoint_order[index];
+							wayPointData = options.waypointsDetail[waypointIndex].options;
+						}
+						
+						
+						
+ 						var contensDomString = $("#direction-contents-dom").html();
+						contensDomString = contensDomString.replace("{EVENT_TITLE}", wayPointData.title);
+						
+						
+						var durationTime = (legTemp.duration.value == 0 ? 60 : legTemp.duration.value);
+						departureTime.setSeconds(departureTime.getSeconds() + durationTime);
+						
+						
+						var years = new String(departureTime.getFullYear());
+						
+						var months = new String(departureTime.getMonth());
+						months = (months.length == 1 ? "0"+months : months);
+						
+						var days = new String(departureTime.getDate());
+						days = (days.length == 1 ? "0"+days : days);
+						
+						var arriveDate = years + "년 " + months + "월 " + days +"일 ";
+						contensDomString = contensDomString.replace("{EVENT_ARRIVE_DATE}", arriveDate);
+						
+						
+						var hours = new String(departureTime.getHours());
+						hours = (hours.length == 1 ? "0"+hours : hours);
+						
+						var minutes = new String(departureTime.getMinutes());
+						minutes = (minutes.length == 1 ? "0"+minutes : minutes);
+						
+						var seconds = new String(departureTime.getSeconds());
+						seconds = (seconds.length == 1 ? "0"+seconds : seconds);
+						
+						var durationTimeMinute = parseInt(durationTime / 60) % 60;
+						
+						var durationTimeHour = parseInt(parseInt(durationTime / 60) / 60);
+						
+						var arriveTime = hours + "시 " + minutes + "분 예정 (" + durationTimeMinute +"분 소요)";
+						if(durationTimeHour > 0){
+							arriveTime = hours + "시 " + minutes + "분 예정 (" + durationTimeHour +"시간 " + durationTimeMinute + "분 소요)";
+						}
+						
+						
+						contensDomString = contensDomString.replace("{EVENT_ARRIVE_TIME}", arriveTime);
+						contensDomString = contensDomString.replace("{EVENT_SHOW_TITLE}", " 관람시간 : ");
+						contensDomString = contensDomString.replace("{EVENT_SHOW_TIME}", "30분 정보 소요");
+						contensDomString = contensDomString.replace("{EVENT_START_ADDRESS}", legTemp.start_address);
+						contensDomString = contensDomString.replace("{EVENT_END_ADDRESS}", legTemp.end_address);
+						
+						var eventTime = 0;
+						var haveMeal = false;
+						if( (departureTime.getHours() >= 11) && (departureTime.getHours() <= 12) ){
+							eventTime  = eventTime + 60;
+							haveMeal   = true;
+						}
+						else if( (departureTime.getHours() >= 17) && (departureTime.getHours() <= 18) ){
+							eventTime  = eventTime + 60;
+							haveMeal   = true;
+						}
+						else{
+							
+						}
+						departureTime.setMinutes(departureTime.getMinutes() + 30 + eventTime);
+
+						var haveSleep = false;
+						if( (departureTime.getHours() >= 19) && (departureTime.getHours() <= 23) ){
+							departureTime.setDate(departureTime.getDate() + 1);
+							departureTime.setHours(8);
+							departureTime.setMinutes(0);
+							haveSleep = true;
+						}
+						else if( (departureTime.getHours() >= 0) && (departureTime.getHours() <= 7) ){
+							departureTime.setDate(departureTime.getDate() + 1);
+							departureTime.setHours(8);
+							departureTime.setMinutes(0);
+							haveSleep = true;
+						}
+						else{
+							
+						}
+			
+						var eventInfo = "";
+						if( (haveMeal == true) && (haveSleep == false) ){
+							eventInfo = "주변식당 검색";
+						}
+						else if( (haveMeal == false) && (haveSleep == true) ){
+							eventInfo = "주변숙박 검색";
+						}
+						else if( (haveMeal == true) && (haveSleep == true) ){
+							eventInfo = "주변식당 검색<br>주변숙박 검색";
+						}
+						contensDomString = contensDomString.replace("{EVENT_INFO}", eventInfo);
+						
+						if(haveMeal == true){
+							
+							function drawRestaurant(data){
+								setTimeout(function(){
+									
+									var options = {
+										  lat : data.lat
+										, lng : data.lng
+										, radius : 300
+										//, type   : ["restaurant"]
+										, keyword   : "food"
+										, icon : "https://maps.gstatic.com/mapfiles/place_api/icons/restaurant-71.png"
+									};
+									
+									
+									$Place.radarSearch(options, function(){
+										
+									});
+									
+								}, 500);
+							};
+							
+							$Circle.draw(wayPointData.lat, wayPointData.lng, 400);
+							drawRestaurant(wayPointData);
+							
+						}
+						else if(haveSleep == true){
+						//	eventInfo = "주변숙박 검색";
+						
+							
+							function drawHotel(data){
+								setTimeout(function(){
+									
+									var options = {
+										  lat : data.lat
+										, lng : data.lng
+										, radius : 300
+										//, type   : ["restaurant"]
+										, keyword   : "hotel"
+										, icon : "https://maps.gstatic.com/mapfiles/place_api/icons/lodging-71.png"
+									};
+									
+									
+									$Place.radarSearch(options, function(){
+										
+									});
+									
+								}, 500);
+							};
+							
+							$Circle.draw(wayPointData.lat, wayPointData.lng, 400);
+							drawHotel(wayPointData);
+							
+						}
+						
+						
+						var contensDom = $(contensDomString);
+						contensDom.data("wayPointData", wayPointData);
+						
+						if(eventInfo != ""){
+							var directionContentsMeal = $(contensDom).find(".direction-contents-event");
+							directionContentsMeal.css("display", "");
+							
+						}
+						
+						contensDom.click(function(){
+							
+							var wayPointData = $(this).data("wayPointData");
+							map.setCenter({lat: wayPointData.lat, lng: wayPointData.lng});
+							map.setZoom(16);
+						});
+						$("#directions-display-panel").append(contensDom);
+						
+					}
+					
+				};
+				
+				
+				function setRouteDirectionDetailContents(routeData, routeIndex, options){
+					
+					console.log("==> setDirectionDetailContents : options : ", options);
+					
+					var departureTime = new Date(options.departureTime);
+					for(var index = 0 ; index < routeData.legs.length ; index++){
+						
+						var legTemp = routeData.legs[index];
+												
+ 						var contensDomString = $("#direction-contents-dom").html();
+						contensDomString = contensDomString.replace("{EVENT_TITLE}", "Routing " + routeIndex);
+						
+						
+						var durationTime = (legTemp.duration.value == 0 ? 60 : legTemp.duration.value);
+						departureTime.setSeconds(departureTime.getSeconds() + durationTime);
+						
+						
+						var years = new String(departureTime.getFullYear());
+						
+						var months = new String(departureTime.getMonth());
+						months = (months.length == 1 ? "0"+months : months);
+						
+						var days = new String(departureTime.getDate());
+						days = (days.length == 1 ? "0"+days : days);
+						
+						var arriveDate = years + "년 " + months + "월 " + days +"일 ";
+						contensDomString = contensDomString.replace("{EVENT_ARRIVE_DATE}", arriveDate);
+						
+						
+						var hours = new String(departureTime.getHours());
+						hours = (hours.length == 1 ? "0"+hours : hours);
+						
+						var minutes = new String(departureTime.getMinutes());
+						minutes = (minutes.length == 1 ? "0"+minutes : minutes);
+						
+						var seconds = new String(departureTime.getSeconds());
+						seconds = (seconds.length == 1 ? "0"+seconds : seconds);
+						
+						var durationTimeMinute = parseInt(durationTime / 60) % 60;
+						
+						var durationTimeHour = parseInt(parseInt(durationTime / 60) / 60);
+						
+						var arriveTime = hours + "시 " + minutes + "분 예정 (" + durationTimeMinute +"분 소요)";
+						if(durationTimeHour > 0){
+							arriveTime = hours + "시 " + minutes + "분 예정 (" + durationTimeHour +"시간 " + durationTimeMinute + "분 소요)";
+						}
+						
+						contensDomString = contensDomString.replace("{EVENT_ARRIVE_TIME}", arriveTime);
+						contensDomString = contensDomString.replace("{EVENT_SHOW_TITLE}", " 운행거리 : ");
+						contensDomString = contensDomString.replace("{EVENT_SHOW_TIME}", legTemp.distance.text);
+						contensDomString = contensDomString.replace("{EVENT_START_ADDRESS}", legTemp.start_address);
+						contensDomString = contensDomString.replace("{EVENT_END_ADDRESS}", legTemp.end_address);
+						
+						
+						var contensDom = $(contensDomString);
+						contensDom.click(function(){
+			
+						});
+						
+						$("#directions-display-panel").append(contensDom);
+						
+					}
+					
+				};
+				
+				$Direction.route(options, function(routeList, options){
+					
+					if(routeList != null){
+						
+						if(options.routeTest == false){
+							setTravelDirectionDetailContents(routeList[0], options);
+						}
+						else{
+							
+							for(var index = 0 ; index < routeList.length; index++){
+								
+								var routeDataTemp = routeList[index];
+								setRouteDirectionDetailContents(routeDataTemp, index + 1, options);
+								
+							//	$Line.draw(lineColor[index], 4, routeDataTemp.overview_path);
+							}
+						}
+					}
+					
+					$Loading.close();
+					
+				});
+				
+			}
+			
+		</script>
+		
+	</body>
+	
+</html>
