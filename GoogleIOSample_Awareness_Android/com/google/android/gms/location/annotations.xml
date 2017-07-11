@@ -1,0 +1,6 @@
+<root>
+    <item
+        name='com.google.android.gms.location.FusedLocationProviderApi com.google.android.gms.common.api.PendingResult&lt;com.google.android.gms.common.api.Status&gt; requestLocationUpdates(com.google.android.gms.common.api.GoogleApiClient, com.google.android.gms.location.LocationRequest, com.google.android.gms.location.LocationCallback, android.os.Looper)'>
+        <annotation name='java.lang.Deprecated' />
+    </item>
+</root>

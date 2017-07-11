@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Awareness API Sample</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="action_lastknownlocation">현재위치 검색</string>
+    <string name="action_requestLocationUpdates">실시간 위치검색 시작</string>
+    <string name="action_removeLocationUpdates">실시간 위치검색 종료</string>
+
+</resources>
