@@ -23,5 +23,5 @@ Google I/O 2017 Seminar에서 시연했던 Awareness API, Cloud Vision API 데�
 
 #### 2.2. Google Cloud Machine Learning의 Vision API를 호출하는 Node.js 서버
 - Folder Name : JSServer
-- Node.js, Javacript
+- Node.js, express
 - Google Cloud Machine Learning Service - Cloud Vision API
