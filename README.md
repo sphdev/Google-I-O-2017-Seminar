@@ -11,7 +11,7 @@ Google I/O 2017 Seminar에서 시연했던 Awareness API, Cloud Vision API 데�
 
 #### 1.2. Awareness API을 이용하여 Location & Context를 측위하는 안드로이드 프로젝트 
 - Folder Name : GoogleIOSample_Awareness_Android
-- Andeoid 4.4 Kitkat
+- Android 4.4 Kitkat
 - Google Play Service - Google Awareness Service, Google Location Service
 <br /> 
 
