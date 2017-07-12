@@ -8,7 +8,6 @@ Google I/O 2017 Seminar에서 시연했던 Awareness API, Cloud Vision API 데�
 - Folder Name : GoogleIOSample_Awareness
 - HTML5/CSS3, Javacript, jQuery 
 - Google Maps Javascript API 
-<br /> 
 
 #### 1.2. Awareness API을 이용하여 Location & Context를 측위하는 안드로이드 프로젝트 
 - Folder Name : GoogleIOSample_Awareness_Android
@@ -21,7 +20,6 @@ Google I/O 2017 Seminar에서 시연했던 Awareness API, Cloud Vision API 데�
 - Folder Name : GoogleIOSample_MachineLearning
 - HTML5/CSS3, Javacript, jQuery 
 - Google Maps Javascript API - Directions Service, Place Service  
-<br /> 
 
 #### 2.2. Google Cloud Machine Learning의 Vision API를 호출하는 Node.js 서버
 - Folder Name : JSServer
